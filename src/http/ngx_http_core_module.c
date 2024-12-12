@@ -1827,6 +1827,11 @@ ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
     return ngx_http_output_filter(r, &out);
 }
 
+void ngx_http_log_request_in_out(ngx_http_request_t *r) {
+    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
+                  "Request received: %V %V %V",
+                  &r->method_name, &r->uri, &r->http_protocol);
+}
 
 ngx_int_t
 ngx_http_send_header(ngx_http_request_t *r)
@@ -1846,6 +1851,9 @@ ngx_http_send_header(ngx_http_request_t *r)
         r->headers_out.status_line.len = 0;
     }
 
+    /* log 3 */
+    ngx_http_log_request_in_out(r);
+    
     return ngx_http_top_header_filter(r);
 }
 
