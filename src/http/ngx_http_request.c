@@ -1079,6 +1079,15 @@ failed:
 #endif
 
 
+
+
+void ngx_http_log_request_in_out(ngx_http_request_t *r) {
+    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
+                  "Request received: %V %V %V",
+                  &r->method_name, &r->uri, &r->http_protocol);
+}
+
+
 static void
 ngx_http_process_request_line(ngx_event_t *rev)
 {
@@ -1238,6 +1247,9 @@ ngx_http_process_request_line(ngx_event_t *rev)
         }
     }
 
+    /* log 1 */
+    ngx_http_log_request_in_out(r);
+    
     ngx_http_run_posted_requests(c);
 }
 
@@ -2564,6 +2576,9 @@ ngx_http_finalize_request(ngx_http_request_t *r, ngx_int_t rc)
         c->read->handler = ngx_http_request_handler;
         c->write->handler = ngx_http_request_handler;
 
+        /* log 2 */
+        ngx_http_log_request_in_out(pr);
+        
         ngx_http_finalize_request(r, ngx_http_special_response_handler(r, rc));
         return;
     }
